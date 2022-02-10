@@ -32,13 +32,13 @@ namespace ArenaOfTimeDemo1
             {
                 playerNumber = 1;
                 Position = new Vector2(100, 250);
-                Hurtbox = new BoundingRectangle(Position.X - 25, Position.Y - 24, 85, 100);
+                Hurtbox = new BoundingRectangle(Position.X - 38, Position.Y - 60, 76, 120);
             }
             else
             {
                 playerNumber = 2;
                 Position = new Vector2(300, 250);
-                Hurtbox = new BoundingRectangle(Position.X - 25, Position.Y - 24, 85, 100);
+                Hurtbox = new BoundingRectangle(Position.X - 38, Position.Y - 60, 76, 120);
             }
         }
 
@@ -108,8 +108,8 @@ namespace ArenaOfTimeDemo1
 
             }
             previousKeyboardState = keyboardState;
-            Hurtbox.X = Position.X - 25;
-            Hurtbox.Y = Position.Y - 24;
+            Hurtbox.X = Position.X - 38;
+            Hurtbox.Y = Position.Y - 60;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -155,32 +155,32 @@ namespace ArenaOfTimeDemo1
                 case AnimationState.walking:
                     if (playerNumber == 1)
                     {
-                        spriteBatch.Draw(walkingTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 0), 3.8f, SpriteEffects.None, 0);
+                        spriteBatch.Draw(walkingTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.None, 0);
                     }
                     else
                     {
-                        spriteBatch.Draw(walkingTextures[5 - animationFrame], Position, null, Color.White, 0, new Vector2(0, 0), 3.8f, SpriteEffects.FlipHorizontally, 0);
+                        spriteBatch.Draw(walkingTextures[5 - animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.FlipHorizontally, 0);
                     }
                     break;
                 case AnimationState.backingup:
                     if (playerNumber == 1)
                     {
-                        spriteBatch.Draw(walkingTextures[5 - animationFrame], Position, null, Color.White, 0, new Vector2(0, 0), 3.8f, SpriteEffects.None, 0);
+                        spriteBatch.Draw(walkingTextures[5 - animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.None, 0);
                     }
                     else
                     {
-                        spriteBatch.Draw(walkingTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 0), 3.8f, SpriteEffects.FlipHorizontally, 0);
+                        spriteBatch.Draw(walkingTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.FlipHorizontally, 0);
                     }
                     
                     break;
                 case AnimationState.attack1:
                     if(playerNumber == 1)
                     {
-                        spriteBatch.Draw(attackTextures[animationFrame], Position, null, Color.White, 0, new Vector2(15, 17), 3.8f, SpriteEffects.None, 0);
+                        spriteBatch.Draw(attackTextures[animationFrame], Position, null, Color.White, 0, new Vector2(16, 7), 3.8f, SpriteEffects.None, 0);
                     }
                     else
                     {
-                        spriteBatch.Draw(attackTextures[animationFrame], Position, null, Color.White, 0, new Vector2(35, 17), 3.8f, SpriteEffects.FlipHorizontally, 0);
+                        spriteBatch.Draw(attackTextures[animationFrame], Position, null, Color.White, 0, new Vector2(22, 7), 3.8f, SpriteEffects.FlipHorizontally, 0);
                     }
                     break;
             }
