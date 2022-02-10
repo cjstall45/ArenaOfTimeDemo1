@@ -10,6 +10,7 @@ namespace ArenaOfTimeDemo1
         private SpriteBatch spriteBatch;
         private VikingSprite vikingSprite1;
         private VikingSprite vikingSprite2;
+        
 
         public Game1()
         {
@@ -41,8 +42,17 @@ namespace ArenaOfTimeDemo1
                 Exit();
             vikingSprite1.Update(gameTime);
             vikingSprite2.Update(gameTime);
-            // TODO: Add your update logic here
-
+            
+            if (vikingSprite1.Hurtbox.CollidesWith(vikingSprite2.Hurtbox))
+            {
+                vikingSprite1.colliding = true;
+                vikingSprite2.colliding = true;
+            }
+            else
+            {
+                vikingSprite1.colliding = false;
+                vikingSprite2.colliding = false;
+            }
             base.Update(gameTime);
         }
 

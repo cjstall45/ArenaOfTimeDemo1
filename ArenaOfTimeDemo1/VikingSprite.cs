@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CollisionExample.Collisions;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ArenaOfTimeDemo1
 {
@@ -25,6 +23,8 @@ namespace ArenaOfTimeDemo1
         private int animationFrame;
         private int playerNumber;
         public Vector2 Position;
+        public BoundingRectangle Hurtbox;
+        public bool colliding = false;
 
         public VikingSprite(int player)
         {
@@ -32,11 +32,13 @@ namespace ArenaOfTimeDemo1
             {
                 playerNumber = 1;
                 Position = new Vector2(100, 250);
+                Hurtbox = new BoundingRectangle(Position.X - 25, Position.Y - 24, 85, 100);
             }
             else
             {
                 playerNumber = 2;
                 Position = new Vector2(300, 250);
+                Hurtbox = new BoundingRectangle(Position.X - 25, Position.Y - 24, 85, 100);
             }
         }
 
@@ -73,12 +75,12 @@ namespace ArenaOfTimeDemo1
             }
             if (playerNumber == 1 && (int) animationState < 4 && keyboardState.IsKeyDown(Keys.A))
             {
-                Position += new Vector2((float) -1.5, 0);
+                Position += new Vector2((float)-1.5, 0); 
                 animationState = AnimationState.backingup;
             }
             else if (playerNumber == 1 && (int)animationState < 4 &&  keyboardState.IsKeyDown(Keys.D))
             {
-                Position += new Vector2((float) 1.5, 0);
+                if (!colliding) { Position += new Vector2((float)1.5, 0); }
                 animationState = AnimationState.walking;
             }
             else if (playerNumber != 1 && keyboardState.IsKeyDown(Keys.NumPad0) && previousKeyboardState.IsKeyUp(Keys.NumPad0))
@@ -89,12 +91,12 @@ namespace ArenaOfTimeDemo1
             }
             else if (playerNumber!= 1 && (int)animationState < 4 && keyboardState.IsKeyDown(Keys.Left))
             {
-                Position += new Vector2((float)-1.5, 0);
+                if (!colliding) { Position += new Vector2((float)-1.5, 0); }
                 animationState = AnimationState.backingup;
             }
             else if (playerNumber != 1 && (int)animationState < 4 && keyboardState.IsKeyDown(Keys.Right))
             {
-                Position += new Vector2((float)1.5, 0);
+                 Position += new Vector2((float)1.5, 0); 
                 animationState = AnimationState.walking;
             }
             else
@@ -106,6 +108,8 @@ namespace ArenaOfTimeDemo1
 
             }
             previousKeyboardState = keyboardState;
+            Hurtbox.X = Position.X - 25;
+            Hurtbox.Y = Position.Y - 24;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
