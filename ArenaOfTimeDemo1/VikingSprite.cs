@@ -1,4 +1,5 @@
-﻿using CollisionExample.Collisions;
+﻿using ArenaOfTimeDemo1.Collisions;
+using CollisionExample.Collisions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,34 +13,56 @@ namespace ArenaOfTimeDemo1
 
         private KeyboardState keyboardState;
         private KeyboardState previousKeyboardState;
+        private GamePadState gamePadState;
+        private GamePadState previousGamePadState;
+
         private float animationSpeed = 0.15f;
 
         private Texture2D[] idleTextures = new Texture2D[6];
         private Texture2D[] walkingTextures = new Texture2D[6];
         private Texture2D[] attackTextures = new Texture2D[6];
+        private Texture2D[] hitTextures = new Texture2D[3];
+        private Texture2D[] deadTextures = new Texture2D[4];
+        private Texture2D[] blockTextures = new Texture2D[5];
 
         private double animationTimer;
 
         private int animationFrame;
         private int playerNumber;
+        public float HealthPercent = 1;
         public Vector2 Position;
-        public BoundingRectangle Hurtbox;
-        public bool colliding = false;
+        public Hitbox Hurtbox;
+        public Hitbox Attack1Hitbox;
+        public bool CollidingLeft = false;
+        public bool CollidingRight = false;
+        private bool activeAnimation = false;
 
         public VikingSprite(int player)
         {
             if (player == 1)
             {
                 playerNumber = 1;
-                Position = new Vector2(100, 250);
-                Hurtbox = new BoundingRectangle(Position.X - 38, Position.Y - 60, 76, 120);
+                Position = new Vector2(80, 300);
+                Hurtbox = new Hitbox(Position.X, Position.Y - 60, 76, 120);
+                Attack1Hitbox = new Hitbox(Hurtbox.Bounds.Right, Hurtbox.Bounds.Top + 7, 76, 148);
+                Attack1Hitbox.Active = false;
             }
             else
             {
                 playerNumber = 2;
-                Position = new Vector2(300, 250);
-                Hurtbox = new BoundingRectangle(Position.X - 38, Position.Y - 60, 76, 120);
+                Position = new Vector2(500, 300);
+                Hurtbox = new Hitbox(Position.X , Position.Y, 76, 120);
+                Attack1Hitbox = new Hitbox(Hurtbox.Bounds.Left - 76, Hurtbox.Bounds.Top + 7, 76, 148);
+                Attack1Hitbox.Active = false;
             }
+        }
+
+        public void Hit()
+        {
+            animationFrame = 0;
+            Hurtbox.Active = false;
+            animationState = AnimationState.hit;
+            activeAnimation = true;
         }
 
         public void LoadContent(ContentManager content)
@@ -62,54 +85,92 @@ namespace ArenaOfTimeDemo1
             attackTextures[3] = content.Load<Texture2D>("attack1_4");
             attackTextures[4] = content.Load<Texture2D>("attack1_5");
             attackTextures[5] = content.Load<Texture2D>("attack1_6");
+            hitTextures[0] = content.Load<Texture2D>("hit_1");
+            hitTextures[1] = content.Load<Texture2D>("hit_2");
+            hitTextures[2] = content.Load<Texture2D>("hit_3");
+            deadTextures[0] = content.Load<Texture2D>("dead_1");
+            deadTextures[1] = content.Load<Texture2D>("dead_2");
+            deadTextures[2] = content.Load<Texture2D>("dead_3");
+            deadTextures[3] = content.Load<Texture2D>("dead_4");
+            blockTextures[0] = content.Load<Texture2D>("block_1");
+            blockTextures[1] = content.Load<Texture2D>("block_2");
+            blockTextures[2] = content.Load<Texture2D>("block_3");
+            blockTextures[3] = content.Load<Texture2D>("block_4");
+            blockTextures[4] = content.Load<Texture2D>("block_5");
+
         }
 
         public void Update(GameTime gameTime)
         {
             keyboardState = Keyboard.GetState();
-            if (playerNumber == 1 && keyboardState.IsKeyDown(Keys.Space) && previousKeyboardState.IsKeyUp(Keys.Space))
+            gamePadState = GamePad.GetState(0); 
+            if (!activeAnimation && playerNumber == 1 && keyboardState.IsKeyDown(Keys.J) && previousKeyboardState.IsKeyUp(Keys.J))
             {
+                activeAnimation = true;
                 animationState = AnimationState.attack1;
                 animationFrame = 0;
                 animationSpeed = .125f;
             }
-            if (playerNumber == 1 && (int) animationState < 4 && keyboardState.IsKeyDown(Keys.A))
+            else if (playerNumber == 1 && !activeAnimation && keyboardState.IsKeyDown(Keys.A))
             {
-                Position += new Vector2((float)-1.5, 0); 
+                if (!CollidingLeft) Position += new Vector2((float)-2, 0); 
                 animationState = AnimationState.backingup;
             }
-            else if (playerNumber == 1 && (int)animationState < 4 &&  keyboardState.IsKeyDown(Keys.D))
+            else if (playerNumber == 1 && !activeAnimation &&  keyboardState.IsKeyDown(Keys.D))
             {
-                if (!colliding) { Position += new Vector2((float)1.5, 0); }
+                if (!CollidingRight) { Position += new Vector2((float)2, 0); }
                 animationState = AnimationState.walking;
             }
-            else if (playerNumber != 1 && keyboardState.IsKeyDown(Keys.NumPad0) && previousKeyboardState.IsKeyUp(Keys.NumPad0))
+            else if (playerNumber == 1 && !activeAnimation && keyboardState.IsKeyDown(Keys.K))
             {
+                activeAnimation = true;
+                animationState = AnimationState.block;
+                animationFrame = 0;
+                Hurtbox.Active = false;
+            }
+            else if (!activeAnimation && playerNumber != 1 && gamePadState.IsButtonDown(Buttons.A) && previousGamePadState.IsButtonUp(Buttons.A))
+            {
+                activeAnimation = true;
                 animationState = AnimationState.attack1;
                 animationFrame = 0;
                 animationSpeed = .125f;
             }
-            else if (playerNumber!= 1 && (int)animationState < 4 && keyboardState.IsKeyDown(Keys.Left))
+            else if (playerNumber != 1 && !activeAnimation && gamePadState.IsButtonDown(Buttons.B) && previousGamePadState.IsButtonUp(Buttons.B))
             {
-                if (!colliding) { Position += new Vector2((float)-1.5, 0); }
+                activeAnimation = true;
+                animationState = AnimationState.block;
+                animationFrame = 0;
+                Hurtbox.Active = false;
+            }
+            else if (playerNumber!= 1 && !activeAnimation && gamePadState.IsButtonDown(Buttons.DPadLeft))
+            {
+                if (!CollidingLeft) { Position += new Vector2((float)-2, 0); }
                 animationState = AnimationState.backingup;
             }
-            else if (playerNumber != 1 && (int)animationState < 4 && keyboardState.IsKeyDown(Keys.Right))
+            else if (playerNumber != 1 && !activeAnimation && gamePadState.IsButtonDown(Buttons.DPadRight))
             {
-                 Position += new Vector2((float)1.5, 0); 
+                if (!CollidingRight) Position += new Vector2((float)2, 0); 
                 animationState = AnimationState.walking;
             }
             else
             {
-                if ((int)animationState < 4)
+                if ((int)animationState < 3)
                 {
                     animationState = AnimationState.idle;
                 }
 
             }
             previousKeyboardState = keyboardState;
-            Hurtbox.X = Position.X - 38;
-            Hurtbox.Y = Position.Y - 60;
+            Hurtbox.Bounds.X = Position.X;
+            Hurtbox.Bounds.Y = Position.Y;
+            if(playerNumber == 1)
+            {
+                Attack1Hitbox.Bounds.X = Hurtbox.Bounds.Right;
+            }
+            else
+            {
+                Attack1Hitbox.Bounds.X = Hurtbox.Bounds.Left - 76;
+            }
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -132,9 +193,45 @@ namespace ArenaOfTimeDemo1
                         break;
                     case AnimationState.attack1:
                         if (animationFrame > 5)
-                        { 
+                        {
+                            animationSpeed = 0.15f;
                             animationFrame = 0;
                             animationState = AnimationState.idle;
+                            activeAnimation = false;
+                        }
+                        break;
+                    case AnimationState.hit:
+                        if(animationFrame > 2)
+                        {
+                            animationFrame = 0;
+                            animationState = AnimationState.idle;
+                            Hurtbox.Active = true;
+                            Attack1Hitbox.Active = false;
+                            activeAnimation = false;
+                            HealthPercent -= .33f;
+                            if(HealthPercent < 0)
+                            {
+                                HealthPercent = 0;
+                                animationState = AnimationState.dead;
+                                activeAnimation = true;
+                                Hurtbox.Active = false;
+                            }
+                        }
+                        break;
+                    case AnimationState.dead:
+                        if(animationFrame > 3)
+                        {
+                            animationFrame = 3;
+                        }
+                        break;
+                    case AnimationState.block:
+                        if(animationFrame > 4)
+                        {
+                            animationFrame = 0;
+                            animationState = AnimationState.idle;
+                            animationSpeed = .15f;
+                            Hurtbox.Active = true;
+                            activeAnimation = false;
                         }
                         break;
                 }
@@ -145,31 +242,31 @@ namespace ArenaOfTimeDemo1
                 case AnimationState.idle:
                     if (playerNumber == 1)
                     {
-                        spriteBatch.Draw(idleTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 0), 3.8f, SpriteEffects.None, 0);
+                        spriteBatch.Draw(idleTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 0), 3.8f, SpriteEffects.None, .5f);
                     }
                     else
                     {
-                        spriteBatch.Draw(idleTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 0), 3.8f, SpriteEffects.FlipHorizontally, 0);
+                        spriteBatch.Draw(idleTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 0), 3.8f, SpriteEffects.FlipHorizontally, .5f);
                     }
                     break;
                 case AnimationState.walking:
                     if (playerNumber == 1)
                     {
-                        spriteBatch.Draw(walkingTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.None, 0);
+                        spriteBatch.Draw(walkingTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.None, .5f);
                     }
                     else
                     {
-                        spriteBatch.Draw(walkingTextures[5 - animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.FlipHorizontally, 0);
+                        spriteBatch.Draw(walkingTextures[5 - animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.FlipHorizontally, .5f);
                     }
                     break;
                 case AnimationState.backingup:
                     if (playerNumber == 1)
                     {
-                        spriteBatch.Draw(walkingTextures[5 - animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.None, 0);
+                        spriteBatch.Draw(walkingTextures[5 - animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.None, .5f);
                     }
                     else
                     {
-                        spriteBatch.Draw(walkingTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.FlipHorizontally, 0);
+                        spriteBatch.Draw(walkingTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, 1), 3.8f, SpriteEffects.FlipHorizontally, .5f);
                     }
                     
                     break;
@@ -177,10 +274,56 @@ namespace ArenaOfTimeDemo1
                     if(playerNumber == 1)
                     {
                         spriteBatch.Draw(attackTextures[animationFrame], Position, null, Color.White, 0, new Vector2(16, 7), 3.8f, SpriteEffects.None, 0);
+                        if(animationFrame == 3)
+                        {
+                            Attack1Hitbox.Active = true;
+                        }
+                        else
+                        {
+                            Attack1Hitbox.Active = false;
+                        }
                     }
                     else
                     {
                         spriteBatch.Draw(attackTextures[animationFrame], Position, null, Color.White, 0, new Vector2(22, 7), 3.8f, SpriteEffects.FlipHorizontally, 0);
+                        if (animationFrame == 3)
+                        {
+                            Attack1Hitbox.Active = true;
+                        }
+                        else
+                        {
+                            Attack1Hitbox.Active = false;
+                        }
+                    }
+                    break;
+                case AnimationState.hit:
+                    if(playerNumber == 1)
+                    {
+                        spriteBatch.Draw(hitTextures[animationFrame], Position, null, Color.Red, 0, new Vector2(3, -1), 3.8f, SpriteEffects.None, .5f);
+                    }
+                    else
+                    {
+                        spriteBatch.Draw(hitTextures[animationFrame], Position, null, Color.Red, 0, new Vector2(0, -1), 3.8f, SpriteEffects.FlipHorizontally, .5f);
+                    }
+                    break;
+                case AnimationState.dead:
+                    if (playerNumber == 1)
+                    {
+                        spriteBatch.Draw(deadTextures[animationFrame], Position, null, Color.White, 0, new Vector2(3, -1), 3.8f, SpriteEffects.None, .5f);
+                    }
+                    else
+                    {
+                        spriteBatch.Draw(deadTextures[animationFrame], Position, null, Color.White, 0, new Vector2(0, -1), 3.8f, SpriteEffects.FlipHorizontally, .5f);
+                    }
+                    break;
+                case AnimationState.block:
+                    if (playerNumber == 1)
+                    {
+                        spriteBatch.Draw(blockTextures[animationFrame], new Vector2(Position.X - 4 , Position.Y - 34), null, Color.Gray, 0, new Vector2(0, 0), 3.8f, SpriteEffects.None, .5f);
+                    }
+                    else
+                    {
+                        spriteBatch.Draw(blockTextures[animationFrame], new Vector2(Position.X - 19 , Position.Y - 34), null, Color.Gray, 0, new Vector2(0, 0), 3.8f, SpriteEffects.FlipHorizontally, .5f);
                     }
                     break;
             }
