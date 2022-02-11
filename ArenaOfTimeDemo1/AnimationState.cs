@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ArenaOfTimeDemo1
 {
+    /// <summary>
+    /// an enum used to show which animation a sprite is currently playing
+    /// </summary>
     public enum AnimationState
     {
         idle,

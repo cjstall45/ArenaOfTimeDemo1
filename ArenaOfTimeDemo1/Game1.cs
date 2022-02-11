@@ -4,6 +4,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace ArenaOfTimeDemo1
 {
+    /// <summary>
+    /// main game class
+    /// </summary>
     public class Game1 : Game
     {
         private GraphicsDeviceManager graphics;
@@ -15,7 +18,9 @@ namespace ArenaOfTimeDemo1
         private Texture2D background;
         private SpriteFont font;
         
-
+        /// <summary>
+        /// base game class that sets up base settings
+        /// </summary>
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -25,7 +30,9 @@ namespace ArenaOfTimeDemo1
             graphics.PreferredBackBufferWidth = 640;
             graphics.PreferredBackBufferHeight = 480;
         }
-
+        /// <summary>
+        /// initalizes player 1 and 2's sprites 
+        /// </summary>
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -34,6 +41,9 @@ namespace ArenaOfTimeDemo1
             base.Initialize();
         }
 
+        /// <summary>
+        /// loads content for both players sprites, the background, the text font, and the players health bars
+        /// </summary>
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -48,6 +58,10 @@ namespace ArenaOfTimeDemo1
             // TODO: use this.Content to load your game content here
         }
 
+        /// <summary>
+        /// calls the update methods of the users sprites and checks for collisions 
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -107,6 +121,10 @@ namespace ArenaOfTimeDemo1
             base.Update(gameTime);
         }
 
+        /// <summary>
+        /// calls both players sprites draw functions draws the health bars for both players and displays text instructing how to restart the game if one player wins 
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);

@@ -5,6 +5,9 @@ using System.Text;
 
 namespace CollisionExample.Collisions
 {
+    /// <summary>
+    /// a class used to help calculate collisions between bounding rectangles
+    /// </summary>
     public static class CollisionHelper
     {
         public static bool Collides(BoundingRectangle a, BoundingRectangle b)

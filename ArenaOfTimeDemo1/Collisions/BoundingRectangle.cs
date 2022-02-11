@@ -5,6 +5,9 @@ using System.Text;
 
 namespace CollisionExample.Collisions
 {
+    /// <summary>
+    /// struct used to create collisions 
+    /// </summary>
     public struct BoundingRectangle
     {
         public float X;

@@ -6,6 +6,9 @@ using System.Text;
 
 namespace ArenaOfTimeDemo1.Collisions
 {
+    /// <summary>
+    /// a class added to create hitboxes for both attacks and hurtboxes 
+    /// </summary>
     public class Hitbox
     {
         public bool Active = true;

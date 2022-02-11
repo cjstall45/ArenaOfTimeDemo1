@@ -37,6 +37,10 @@ namespace ArenaOfTimeDemo1
         public bool CollidingRight = false;
         private bool activeAnimation = false;
 
+        /// <summary>
+        /// initalized the sprite in its starting position. Adds Hurtboxes and hitboxes for the sprits attacks
+        /// </summary>
+        /// <param name="player">the index for player 1 or 2</param>
         public VikingSprite(int player)
         {
             if (player == 1)
@@ -56,7 +60,9 @@ namespace ArenaOfTimeDemo1
                 Attack1Hitbox.Active = false;
             }
         }
-
+        /// <summary>
+        /// a methoid called by the collision detection in the main game that indicates the player was hit and updates values and animations to match
+        /// </summary>
         public void Hit()
         {
             animationFrame = 0;
@@ -65,6 +71,10 @@ namespace ArenaOfTimeDemo1
             activeAnimation = true;
         }
 
+        /// <summary>
+        /// loads content for all the animations into seperate arrays for each one
+        /// </summary>
+        /// <param name="content"></param>
         public void LoadContent(ContentManager content)
         {
             idleTextures[0] = content.Load<Texture2D>("ready_1");
@@ -100,6 +110,10 @@ namespace ArenaOfTimeDemo1
 
         }
 
+        /// <summary>
+        /// adds controls for player one on keyboard and player 2 on controller. updates animation state based on input and moves hitboxes for collisions 
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
             keyboardState = Keyboard.GetState();
@@ -173,6 +187,11 @@ namespace ArenaOfTimeDemo1
             }
         }
 
+        /// <summary>
+        /// draws all animations. Creates one switch for timing and handleing the looping or ending of the animation and one switch method for the actual draw function
+        /// </summary>
+        /// <param name="gameTime"></param>
+        /// <param name="spriteBatch"></param>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
